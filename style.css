@@ -1,0 +1,41 @@
+body{
+    background-color: thistle;
+}
+
+div.damier{
+    background-color: brown;
+    height:500px;
+    width:500px;
+    display: grid;
+    grid-template-rows: repeat(8,1fr);
+    grid-template-columns: repeat(8,1fr);
+}
+
+div.case.black{
+    background-color: chocolate;
+}
+
+div.case.white{
+    background-color: beige;
+}
+
+div.case{
+    display:flex;
+    align-items: center;
+    justify-content: center;
+}
+
+div.pion.black{
+    background-color: black;
+}
+
+div.pion.white{
+    background-color: white;
+}
+
+div.pion{
+    width:75%;
+    height:75%;
+    border-radius:50%;
+    border:black solid 2px;
+}
