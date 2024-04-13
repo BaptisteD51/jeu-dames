@@ -1,3 +1,19 @@
+class C{
+    constructor(x,y,color){
+        this.x = x
+        this.y = y
+        this.color = color
+    }
+
+    render(){
+        var cHtml = document.createElement('div')
+        cHtml.classList.value = 'x'+this.x + ' y' + this.y + ' ' + this.color + ' case'
+        cHtml.dataset.x = this.x
+        cHtml.dataset.y = this.y
+        return cHtml
+    }
+}
+
 class Pion{
     constructor(x,y,color){
         this.x = x
@@ -28,70 +44,123 @@ class Damier{
     constructor(){
         this.grid = []
         var c = "white"
-        for(var i = 1; i <= 8; i++){
+        for(var i = 1; i <= 10; i++){
             c = (c=='white') ? 'black' : 'white'
             let line = []
-            for(var j = 1; j <= 8; j++){
+            for(var j = 1; j <= 10; j++){
                 c = (c=='white') ? 'black' : 'white'
-                line.push({
-                    x:j,
-                    y:i,
-                    color:c,
-                })
+                line.push(new C(j,i,c))
             }
             this.grid.push(line)  
         }
 
         this.pions = []
         for(var i = 1; i <= 4; i++){
-            for(var j = 1; j <= 8; j+=2){
-                var pion = new Pion(j,i,"black")
+            c = (c=='white') ? 'black' : 'white'
+            for(var j = 1; j <= 10; j+=2){
+                var x = (c=='black') ? j : j+1
+                var y = i
+                var pion = new Pion(x,y,"black")
                 this.pions.push(pion)
             }
         }
 
-        for(var i = 5; i <= 8; i++){
-            for(var j = 1; j <= 8; j+=2){
-                var pion = new Pion(j,i,"white")
+        for(var i = 7; i <= 10; i++){
+            c = (c=='white') ? 'black' : 'white'
+            for(var j = 1; j <= 10; j+=2){
+                var x = (c=='black') ? j : j+1
+                var y = i
+                var pion = new Pion(x,y,"white")
                 this.pions.push(pion)
             }
         }
     }
 
-    render_damier(){
+    #render_damier(){
         const damier = document.createElement('div')
         damier.classList.value = "damier"
         document.body.appendChild(damier)
         
         this.grid.forEach((line)=>{
-            line.forEach((e)=>{
-                const c = document.createElement('div')
-                c.classList.value = "case"
-                c.classList.add(e.color)
-                c.style.gridRow = e.y
-                c.style.gridColumn = e.x
-                c.classList.add('x'+e.x)
-                c.classList.add('y'+e.y)
-                damier.appendChild(c)
+            line.forEach((c)=>{
+                var cHtml = c.render()
+                damier.appendChild(cHtml)
             })
         })
     }
 
-    render_pions(){
+    #render_pions(){
         this.pions.forEach((pion)=>{
             var c = document.querySelector("div.x"+pion.x+".y"+pion.y)
             var pionHtml = document.createElement('div')
             pionHtml.classList.value = 'pion ' + pion.color + ' x' + pion.x + ' y' + pion.y
+            pionHtml.dataset.x = pion.x
+            pionHtml.dataset.y = pion.y
             c.appendChild(pionHtml)
         })
     }
 
     render(){
-        this.render_damier()
-        this.render_pions()
+        document.body.innerHTML = ""
+        this.#render_damier()
+        this.#render_pions()
     }
 }
 
-let pion2 = new Pion(2,3,'white')
-pion2.move([3,4])
-let damier = new Damier()
+// class Player{
+//     constructor(color){
+//         this.color = color
+//     }
+
+//     selectPion(){
+//         var pions = document.querySelectorAll('div.pion.'+this.color)
+//         pions.forEach((pion)=>{
+//             pion.addEventListener('click', function(){
+//                 return(this)
+//             })
+//         })
+//     }
+// }
+
+class Game{
+    constructor(){
+        this.damier = new Damier()
+    }
+
+    selectPion(){
+        var pions = document.querySelectorAll('div.pion')
+        pions.forEach((pion)=>{
+            pion.addEventListener('click', ()=>{
+                var x = pion.dataset.x
+                var y = pion.dataset.y
+                this.damier.pions.forEach((pion)=>{
+                    if(x == pion.x && y==pion.y){
+                        console.log(pion)
+                        // use something with .bind to change the context for the this
+                        this.#movePossibility(pion)
+                        return pion
+                    }
+                })
+            })
+        })
+    }
+
+    #movePossibility(pion){
+        var d = (pion.color == 'white') ? -1 : 1
+        var cHtml1 = document.querySelector("div.x"+(parseInt(pion.x)-1)+".y"+(parseInt(pion.y)+d))
+        var cHtml2 = document.querySelector("div.x"+(parseInt(pion.x)+1)+".y"+(parseInt(pion.y)+d))
+        var cs = [cHtml1,cHtml2]
+        console.log(cs)
+        cs.forEach((cHtml)=>{
+            cHtml.classList.add('red')
+            cHtml.addEventListener('click', ()=>{
+                pion.move([cHtml.dataset.x,cHtml.dataset.y])
+                this.damier.render()
+            })
+        })
+    }
+}
+
+const game = new Game()
+game.damier.render()
+game.selectPion()
